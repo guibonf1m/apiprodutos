@@ -1,0 +1,23 @@
+package main
+# Configurações de IDEs
+.idea/
+*.iml
+.vscode/
+
+# Executáveis e temporários
+*.exe
+*.log
+*.out
+*.tmp
+
+# Arquivos de dependência que não devem ser versionados
+vendor/
+bin/
+obj/
+
+# Arquivos de ambiente
+.env
+
+# Cache do Go
+*.test
+
