@@ -22,9 +22,50 @@ type ProdutoHandler struct {
 }
 
 func (h *ProdutoHandler) GetProdutos(c *gin.Context) {
+	nome := c.Param("nome")
+	emEstoqueRecebido := c.Query("em_estoque")
+	categoria := c.Query("categoria")
+
+	var emEstoqueBool bool
+	var aplicarFiltrosEstoque bool
+
+	if emEstoqueRecebido != "" {
+		var err error
+		emEstoqueBool, err = strconv.ParseBool(emEstoqueRecebido)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, ResponseInfo{
+				Error:  true,
+				Result: "valor inválido para o filtro em_estoque, use (true ou false)",
+			})
+			return
+		}
+		aplicarFiltrosEstoque = true
+	}
+
+	filtro := service.FiltroProduto{}
+
+	if nome != "" {
+		filtro.Nome = &nome
+	}
+	if categoria != "" {
+		filtro.Categoria = &categoria
+	}
+	if aplicarFiltrosEstoque {
+		filtro.EmEstoque = &emEstoqueBool
+	}
+
+	produtos, err := h.Service.BuscarPorLista(filtro)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, ResponseInfo{
+			Error:  true,
+			Result: err.Error(),
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, ResponseInfo{
 		Error:  false,
-		Result: h.Repo.GetProdutos(),
+		Result: produtos,
 	})
 }
 
@@ -45,42 +86,6 @@ func (h *ProdutoHandler) GetProduto(c *gin.Context) {
 		c.JSON(http.StatusNotFound, ResponseInfo{
 			Error:  true,
 			Result: "produto não existe",
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, ResponseInfo{
-		Error:  false,
-		Result: produto,
-	})
-}
-
-func (h *ProdutoHandler) GetProdutoPeloNome(c *gin.Context) {
-	nome := c.Param("name")
-
-	produto := h.Repo.GetProdutoPeloNome(nome)
-	if produto.ID == 0 {
-		c.JSON(http.StatusNotFound, ResponseInfo{
-			Error:  true,
-			Result: "Produto não existe",
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, ResponseInfo{
-		Error:  false,
-		Result: produto,
-	})
-}
-
-func (h *ProdutoHandler) GetProdutoPelaCategoria(c *gin.Context) {
-	categoria := c.Param("category")
-
-	produto := h.Repo.GetProdutoPelaCategoria(categoria)
-	if produto.ID == 0 {
-		c.JSON(http.StatusNotFound, ResponseInfo{
-			Error:  true,
-			Result: "Produto não existe",
 		})
 		return
 	}

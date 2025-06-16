@@ -18,6 +18,12 @@ type ProdutoService struct {
 	Repo *repository.ProdutoRepository
 }
 
+type FiltroProduto struct {
+	Nome      *string
+	Categoria *string
+	EmEstoque *bool
+}
+
 func (p *ProdutoService) ValidarECriarProduto(produto entity.Produto) (entity.Produto, error) {
 
 	if produto.Preco <= 0 {
@@ -39,7 +45,7 @@ func (p *ProdutoService) ValidarECriarProduto(produto entity.Produto) (entity.Pr
 	return novoProduto, nil
 }
 
-func (p *ProdutoService) ListarProdutosComFiltro(produto entity.Produto) (entity.Produto, error) {
+func (p *ProdutoService) BuscarPorLista(filtro FiltroProduto) ([]entity.Produto, error) {
 
 }
 
