@@ -7,5 +7,5 @@ type Produto struct {
 	Preco      float64 `json:"preco"`
 	EmEstoque  bool    `json:"em_estoque"`
 	Quantidade int     `json:"quantidade"`
-	Desconto   float64 `json:"desconto"` // percentual de 0 a 100
+	Desconto   float64 `json:"desconto"`
 }
