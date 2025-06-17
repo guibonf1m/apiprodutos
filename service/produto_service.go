@@ -45,8 +45,18 @@ func (p *ProdutoService) ValidarECriarProduto(produto entity.Produto) (entity.Pr
 	return novoProduto, nil
 }
 
-func (p *ProdutoService) BuscarPorLista(filtro FiltroProduto) ([]entity.Produto, error) {
+func (p *ProdutoService) BuscarPorLista(filtrosDoUsuario FiltroProduto) ([]entity.Produto, error) {
 
+	produtos := p.Repo.GetProdutos()
+
+	for _, v := range produtos {
+		if filtrosDoUsuario.EmEstoque != nil {
+			if v.EmEstoque != *filtrosDoUsuario.EmEstoque {
+				er := errors.New("Categoria não encontrada, para esse produto.")
+				return entity.Produto{}, er
+			}
+		}
+	}
 }
 
 func (p *ProdutoService) AtualizarProdutoPorId(produto entity.Produto) (entity.Produto, error) {
