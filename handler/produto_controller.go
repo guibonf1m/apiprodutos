@@ -25,6 +25,7 @@ func (h *ProdutoHandler) GetProdutos(c *gin.Context) {
 	nome := c.Param("nome")
 	emEstoqueRecebido := c.Query("em_estoque")
 	categoria := c.Query("categoria")
+	mostrarTodosRecebido := c.Query("mostrar_todos")
 
 	var emEstoqueBool bool
 	var aplicarFiltrosEstoque bool
@@ -42,7 +43,24 @@ func (h *ProdutoHandler) GetProdutos(c *gin.Context) {
 		aplicarFiltrosEstoque = true
 	}
 
-	filtro := service.CategoriaFiltro{}
+	mostrarTodos := false
+
+	if mostrarTodosRecebido != "" {
+		var err error
+		mostrarTodos, err = strconv.ParseBool(mostrarTodosRecebido)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, ResponseInfo{
+				Error:  true,
+				Result: "valor inválido para o filtro mostrar_todos, use (true ou false)",
+			})
+			return
+		}
+
+	}
+
+	filtro := service.CategoriaFiltro{
+		MostrarTodos: mostrarTodos,
+	}
 
 	if nome != "" {
 		filtro.Nome = &nome
@@ -116,10 +134,11 @@ func (h *ProdutoHandler) AddProduto(c *gin.Context) {
 		})
 		return
 	}
+	produtoResponse := service.NovoProdutoResponse(produtoCriado)
 
 	c.JSON(http.StatusCreated, ResponseInfo{
 		Error:  false,
-		Result: produtoCriado,
+		Result: produtoResponse,
 	})
 }
 
@@ -155,9 +174,10 @@ func (h *ProdutoHandler) UpdateProduto(c *gin.Context) {
 		return
 	}
 
+	produtoResponse := service.NovoProdutoResponse(produtoAtualizado)
 	c.JSON(http.StatusOK, ResponseInfo{
 		Error:  false,
-		Result: produtoAtualizado,
+		Result: produtoResponse,
 	})
 }
 
