@@ -42,7 +42,7 @@ func (h *ProdutoHandler) GetProdutos(c *gin.Context) {
 		aplicarFiltrosEstoque = true
 	}
 
-	filtro := service.FiltroProduto{}
+	filtro := service.CategoriaFiltro{}
 
 	if nome != "" {
 		filtro.Nome = &nome
@@ -54,7 +54,7 @@ func (h *ProdutoHandler) GetProdutos(c *gin.Context) {
 		filtro.EmEstoque = &emEstoqueBool
 	}
 
-	produtos, err := h.Service.BuscarPorLista(filtro)
+	produtos, err := h.Service.BuscarPorCategoria(filtro)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ResponseInfo{
 			Error:  true,
@@ -76,7 +76,7 @@ func (h *ProdutoHandler) GetProduto(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, ResponseInfo{
 			Error:  true,
-			Result: "o parametro nao e um numero",
+			Result: "o parametro não é um número, tente novamente.",
 		})
 		return
 	}
@@ -85,7 +85,7 @@ func (h *ProdutoHandler) GetProduto(c *gin.Context) {
 	if produto.ID == 0 {
 		c.JSON(http.StatusNotFound, ResponseInfo{
 			Error:  true,
-			Result: "produto não existe",
+			Result: "produto não existe, tente novamente.",
 		})
 		return
 	}

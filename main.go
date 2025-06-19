@@ -24,8 +24,9 @@ func main() {
 
 	r.GET("", index)
 	r.GET("/produtos", produtoHandler.GetProdutos)
-	r.POST("/produtos", produtoHandler.AddProduto)
+	r.POST("/produtos/:categoria", produtoHandler.AddProduto)
 	r.GET("/produtos/:id", produtoHandler.GetProduto)
+	r.GET("/produtos/categoria/:categoria", produtoHandler.GetProdutos)
 	r.PUT("/produtos/:id", produtoHandler.UpdateProduto)
 	r.DELETE("/produtos/:id", produtoHandler.DeleteProduto)
 

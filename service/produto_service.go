@@ -18,13 +18,18 @@ type ProdutoService struct {
 	Repo *repository.ProdutoRepository
 }
 
-type FiltroProduto struct {
+type CategoriaFiltro struct {
 	Nome      *string
 	Categoria *string
 	EmEstoque *bool
 }
 
 func (p *ProdutoService) ValidarECriarProduto(produto entity.Produto) (entity.Produto, error) {
+
+	if !categoriasPermitidas[produto.Categoria] {
+		er := errors.New("Categoria inválida.")
+		return entity.Produto{}, er
+	}
 
 	if produto.Preco <= 0 {
 		er := errors.New("O produto tem preço inválido.")
@@ -45,18 +50,24 @@ func (p *ProdutoService) ValidarECriarProduto(produto entity.Produto) (entity.Pr
 	return novoProduto, nil
 }
 
-func (p *ProdutoService) BuscarPorLista(filtrosDoUsuario FiltroProduto) ([]entity.Produto, error) {
+func (p *ProdutoService) BuscarPorCategoria(filtro CategoriaFiltro) ([]entity.Produto, error) {
 
 	produtos := p.Repo.GetProdutos()
 
-	for _, v := range produtos {
-		if filtrosDoUsuario.EmEstoque != nil {
-			if v.EmEstoque != *filtrosDoUsuario.EmEstoque {
-				er := errors.New("Categoria não encontrada, para esse produto.")
-				return entity.Produto{}, er
-			}
+	if filtro.Categoria == nil || *filtro.Categoria == "" {
+		return produtos, nil
+	}
+
+	var filtrados []entity.Produto
+	for _, produto := range produtos {
+		if filtro.Categoria != nil && produto.Categoria == *filtro.Categoria {
+			filtrados = append(filtrados, produto)
 		}
 	}
+	if len(filtrados) == 0 {
+		return nil, errors.New("Nenhum produto encontrado para essa categoria.")
+	}
+	return filtrados, nil
 }
 
 func (p *ProdutoService) AtualizarProdutoPorId(produto entity.Produto) (entity.Produto, error) {
